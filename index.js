@@ -1,2 +1,2 @@
 import '@babel/polyfill';
-import './server';
+import './src/server';
