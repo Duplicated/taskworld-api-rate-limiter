@@ -1,5 +1,5 @@
 export const invalidAuth = (req, res, next) => {
-  if (!req.header('x-user-id')) {
+  if (!req.get('x-user-id')) {
     return res
       .status(401)
       .send({ successful: false, message: 'Missing user id' });
