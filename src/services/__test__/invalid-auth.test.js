@@ -15,7 +15,7 @@ const reqOptions = {
 };
 
 describe("Check if X-USER-ID header is included", () => {
-  it("Case 1: X-USER-ID is included", () => {
+  it("Case 1: X-USER-ID is included", async () => {
     const mockRequest = httpMocks.createRequest({
       ...reqOptions,
       headers: {
@@ -25,20 +25,20 @@ describe("Check if X-USER-ID header is included", () => {
     });
     const mockResponse = httpMocks.createResponse();
     const next = jest.fn();
-    invalidAuth(mockRequest, mockResponse, next);
+    await invalidAuth(mockRequest, mockResponse, next);
     expect(next).toHaveBeenCalled();
   });
-  it("Case 2: X-USER-ID is missing", () => {
+  it("Case 2: X-USER-ID is missing", async () => {
     const mockRequest = httpMocks.createRequest(reqOptions);
     const mockResponse = httpMocks.createResponse();
     const next = jest.fn();
-    invalidAuth(mockRequest, mockResponse, next);
-    expect(mockResponse).toMatchObject(
+    const resultResponse = await invalidAuth(mockRequest, mockResponse, next);
+    expect(resultResponse).toMatchObject(
       expect.objectContaining({
         statusCode: 401,
       })
     );
-    expect(mockResponse._getData()).toEqual(
+    expect(resultResponse._getData()).toEqual(
       expect.objectContaining({ successful: false, message: "Missing user id" })
     );
   });
