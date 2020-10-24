@@ -8,7 +8,7 @@ export const invalidAuth = async (req, res, next) =>
   new Promise(async (resolve, reject) => {
     try {
       if (!req.get('x-user-id')) {
-        resolve(
+        return resolve(
           res
             .status(401)
             .send({ successful: false, message: 'Missing user id' })
@@ -18,8 +18,10 @@ export const invalidAuth = async (req, res, next) =>
       }
     } catch (error) {
       console.log('error: ', error);
-      reject(
-        res.status(500).send({ successful: false, message: 'Internal Server Error' })
+      return reject(
+        res
+          .status(500)
+          .send({ successful: false, message: 'Internal Server Error' })
       );
     }
   });
@@ -41,7 +43,7 @@ export const rateLimit = async (req, res, next) =>
         });
         redis.set(userId, JSON.stringify(newUserLogs));
         // TODO: replace with proxy call
-        resolve(
+        return resolve(
           res.status(200).send({ successful: true, message: 'forwarding...' })
         );
       }
@@ -65,8 +67,8 @@ export const rateLimit = async (req, res, next) =>
       );
 
       // limit exceeded
-      if (totalValidRequestsCount >= config.requestLimit) {
-        resolve(
+      if (totalValidRequestsCount > config.requestLimit) {
+        return resolve(
           res.status(429).send({
             successful: false,
             message: 'request limit exceeded, please try again later',
@@ -89,13 +91,15 @@ export const rateLimit = async (req, res, next) =>
       }
       redis.set(userId, JSON.stringify(parsedRequestLogs));
       // TODO: replace with proxy call
-      resolve(
+      return resolve(
         res.status(200).send({ successful: true, message: 'forwarding...' })
       );
     } catch (error) {
       console.log('error: ', error);
-      reject(
-        res.status(500).send({ successful: false, message: 'Internal Server Error' })
+      return reject(
+        res
+          .status(500)
+          .send({ successful: false, message: 'Internal Server Error' })
       );
     }
   });
