@@ -25,7 +25,7 @@
 
 * Chosen algorithm: **Sliding Window Counter**
   
-  * Rationale: This is a compromise between Fixed Window Counter and Sliding Log algorithms. The window starts from the API call with timestamp >= 60 seconds ago, up until the current timestamp.
+  * Rationale: This is a compromise between Fixed Window Counter and Sliding Log algorithms. The window starts from the API call with timestamp >= 60 seconds ago, up until the current timestamp, so it will keep "sliding" forward in time as newer requests come in. The limiter will check the sum of all counters for each timestamp within this window, and will reject any new request until the time window has elapsed.
  
 
 ### TODOs
