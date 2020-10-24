@@ -14,6 +14,7 @@
   },
   "scripts": {
     "start:dev": "nodemon --exec babel-node index.js",
+    "debugTest": "jest --runInBand --detectOpenHandles",
     "test": "jest"
   },
   "repository": {
@@ -38,6 +39,7 @@
     "@babel/cli": "^7.12.1",
     "@babel/core": "^7.12.3",
     "@babel/node": "^7.12.1",
+    "@babel/plugin-transform-runtime": "^7.12.1",
     "@babel/preset-env": "^7.12.1",
     "jest": "^26.6.1",
     "node-mocks-http": "^1.9.0",
