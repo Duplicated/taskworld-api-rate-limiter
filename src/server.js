@@ -13,6 +13,17 @@ const app = express();
   app.use(bodyParser.json());
 
   app.post('*', [invalidAuth, rateLimit]);
+  app.all(
+    '*',
+    async (req, res) =>
+      new Promise((resolve) =>
+        resolve(
+          res
+            .status(501)
+            .send({ successful: false, message: 'Not implemented yet' })
+        )
+      )
+  );
 
   app.listen(config.port, config.hostName, () =>
     console.log(
