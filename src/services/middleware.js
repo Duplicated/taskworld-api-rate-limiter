@@ -1,5 +1,4 @@
 import moment from 'moment';
-import { get, filter, reduce } from 'lodash';
 import config from '../config';
 import redis from './redis';
 
@@ -49,18 +48,16 @@ export const rateLimit = async (req, res, next) =>
       const parsedRequestLogs = JSON.parse(existingUser);
       console.log('parsedRequestLogs >>>>> ', parsedRequestLogs);
       const windowBeginTimestamp = now
-      .clone()
-      .subtract(TIME_WINDOW_DURATION_SECONDS, 'seconds')
-      .unix();
+        .clone()
+        .subtract(TIME_WINDOW_DURATION_SECONDS, 'seconds')
+        .unix();
       console.log('windowBeginTimestamp: ', windowBeginTimestamp);
-      const validTimestampRequests = filter(
-        parsedRequestLogs,
-        (log) => get(log, 'requestTimestamp') > windowBeginTimestamp
+      const validTimestampRequests = parsedRequestLogs.filter(
+        (log) => log.requestTimestamp > windowBeginTimestamp
       );
       console.log('validTimestampRequests >>>>>', validTimestampRequests);
-      const totalValidRequestsCount = reduce(
-        validTimestampRequests,
-        (sum, request) => sum + get(request, 'counter'),
+      const totalValidRequestsCount = validTimestampRequests.reduce(
+        (sum, request) => sum + request.counter,
         0
       );
 
@@ -78,7 +75,7 @@ export const rateLimit = async (req, res, next) =>
       // one can increment the most recent log's counter in case of burst
       // requests (where they all occur within the same second)
       let latestUserLog = parsedRequestLogs[parsedRequestLogs.length - 1];
-      if (now.unix() <= get(latestUserLog, 'requestTimestamp')) {
+      if (now.unix() <= latestUserLog.requestTimestamp) {
         latestUserLog.counter += 1;
       } else {
         // start a new counter for this timestamp
