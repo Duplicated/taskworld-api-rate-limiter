@@ -17,7 +17,10 @@ export const invalidAuth = async (req, res, next) =>
         resolve(next());
       }
     } catch (error) {
-      reject(error);
+      console.log('error: ', error);
+      reject(
+        res.status(500).send({ successful: false, message: 'Internal Server Error' })
+      );
     }
   });
 
@@ -90,6 +93,9 @@ export const rateLimit = async (req, res, next) =>
         res.status(200).send({ successful: true, message: 'forwarding...' })
       );
     } catch (error) {
-      reject(error);
+      console.log('error: ', error);
+      reject(
+        res.status(500).send({ successful: false, message: 'Internal Server Error' })
+      );
     }
   });
