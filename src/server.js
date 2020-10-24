@@ -7,7 +7,7 @@ const app = express();
 
 app.use(bodyParser.json());
 app.post('*', [invalidAuth, rateLimit]);
- 
+
 app.listen(process.env.PORT, () =>
-  console.log(`Example app listening on port ${process.env.PORT}!`),
+  console.log(`Example app listening on port ${process.env.PORT}!`)
 );

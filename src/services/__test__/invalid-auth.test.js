@@ -1,5 +1,5 @@
 import httpMocks from "node-mocks-http";
-import { invalidAuth } from "./middleware";
+import { invalidAuth } from "../middleware";
 
 const reqOptions = {
   method: "POST",
