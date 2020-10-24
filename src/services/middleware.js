@@ -1,5 +1,9 @@
+import moment from 'moment';
+import { get, filter, reduce } from 'lodash';
 import config from '../config';
 import redis from './redis';
+
+const TIME_WINDOW_DURATION_SECONDS = 60;
 
 export const invalidAuth = async (req, res, next) =>
   new Promise(async (resolve, reject) => {
@@ -18,26 +22,77 @@ export const invalidAuth = async (req, res, next) =>
     }
   });
 
-const validateLimit = async (req) => {
-  const userId = req.get('x-user-id');
-  // increment request count for this userId
-  const res = await redis.incr(userId);
-  if (res > config.requestLimit) {
-    return true;
-  }
-  await redis.expire(userId, 60);
-};
+export const rateLimit = async (req, res, next) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const now = moment();
+      const userId = req.get('x-user-id');
+      const existingUser = await redis.get(userId);
+      console.log('existingUserRecord >>>>> ', existingUser);
+      // if there is no log of this particular user, initialize
+      // this user's request counter
+      if (!existingUser) {
+        const newUserLogs = [];
+        newUserLogs.push({
+          requestTimestamp: now.unix(),
+          counter: 1,
+        });
+        redis.set(userId, JSON.stringify(newUserLogs));
+        // TODO: replace with proxy call
+        resolve(
+          res.status(200).send({ successful: true, message: 'forwarding...' })
+        );
+      }
+      // otherwise, generate starting timestamp for the current time window
+      // (from 60 seconds in the past up until now), then sum all counters
+      // of requests that belong within this time window only
+      const parsedRequestLogs = JSON.parse(existingUser);
+      console.log('parsedRequestLogs >>>>> ', parsedRequestLogs);
+      const windowBeginTimestamp = now
+      .clone()
+      .subtract(TIME_WINDOW_DURATION_SECONDS, 'seconds')
+      .unix();
+      console.log('windowBeginTimestamp: ', windowBeginTimestamp);
+      const validTimestampRequests = filter(
+        parsedRequestLogs,
+        (log) => get(log, 'requestTimestamp') > windowBeginTimestamp
+      );
+      console.log('validTimestampRequests >>>>>', validTimestampRequests);
+      const totalValidRequestsCount = reduce(
+        validTimestampRequests,
+        (sum, request) => sum + get(request, 'counter'),
+        0
+      );
 
-export const rateLimit = async (req, res, next) => {
-  const status = await validateLimit(req);
-  if (status) {
-    return res
-      .status(429)
-      .send({
-        successful: false,
-        message: 'Too many requests, please try again later',
-      });
-  }
-  return res.status(200).send({ successful: true, message: 'forwarding...' });
-  // forward to reverse proxy or load balancer endpoint
-};
+      // limit exceeded
+      if (totalValidRequestsCount >= config.requestLimit) {
+        resolve(
+          res.status(429).send({
+            successful: false,
+            message: 'request limit exceeded, please try again later',
+          })
+        );
+      }
+
+      // since moment().unix() gives time granularity at second level,
+      // one can increment the most recent log's counter in case of burst
+      // requests (where they all occur within the same second)
+      let latestUserLog = parsedRequestLogs[parsedRequestLogs.length - 1];
+      if (now.unix() <= get(latestUserLog, 'requestTimestamp')) {
+        latestUserLog.counter += 1;
+      } else {
+        // start a new counter for this timestamp
+        parsedRequestLogs.push({
+          requestTimestamp: now.unix(),
+          counter: 1,
+        });
+      }
+      redis.set(userId, JSON.stringify(parsedRequestLogs));
+      // TODO: replace with proxy call
+      resolve(
+        res.status(200).send({ successful: true, message: 'forwarding...' })
+      );
+    } catch (error) {
+      reject(error);
+    }
+  });
