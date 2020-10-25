@@ -45,7 +45,6 @@ export const rateLimit = async (req, res, next) =>
       const now = moment();
       const userId = req.get('x-user-id');
       const existingUser = await redis.get(userId);
-      console.log('existingUserRecord >>>>> ', existingUser);
       // if there is no log of this particular user, initialize
       // this user's request counter
       if (!existingUser) {
@@ -65,16 +64,13 @@ export const rateLimit = async (req, res, next) =>
       // (from 60 seconds in the past up until now), then sum all counters
       // of requests that belong within this time window only
       const parsedRequestLogs = JSON.parse(existingUser);
-      console.log('parsedRequestLogs >>>>> ', parsedRequestLogs);
       const windowBeginTimestamp = now
         .clone()
         .subtract(TIME_WINDOW_DURATION_SECONDS, 'seconds')
         .unix();
-      console.log('windowBeginTimestamp: ', windowBeginTimestamp);
       const validTimestampRequests = parsedRequestLogs.filter(
         (log) => log.requestTimestamp > windowBeginTimestamp
       );
-      console.log('validTimestampRequests >>>>>', validTimestampRequests);
       const totalValidRequestsCount = validTimestampRequests.reduce(
         (sum, request) => sum + request.counter,
         0
