@@ -10,9 +10,10 @@ beforeEach(() => {
   process.env = { ...OLD_ENV };
 });
 
-afterAll((done) => {
+afterAll(async (done) => {
   // restore old env
   process.env = OLD_ENV;
+  await redis.flushall();
   redis.disconnect();
   done();
 });
