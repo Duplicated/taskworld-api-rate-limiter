@@ -2,7 +2,11 @@ import config from './config';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import { invalidAuth, rateLimit } from './services/middleware';
+import {
+  invalidAuth,
+  rateLimit,
+  notImplementedRoutes,
+} from './services/middleware';
 
 const app = express();
 
@@ -12,26 +16,7 @@ const app = express();
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
 
-  app.use(
-    '*',
-    async (req, res, next) =>
-      new Promise((resolve) => {
-        if (
-          req.method === 'GET' ||
-          req.method === 'PUT' ||
-          req.method === 'PATCH' ||
-          req.method === 'DELETE'
-        ) {
-          return resolve(
-            res
-              .status(501)
-              .send({ successful: false, message: 'Not implemented yet' })
-          );
-        } else {
-          resolve(next());
-        }
-      })
-  );
+  app.use('*', notImplementedRoutes);
   app.post('*', [invalidAuth, rateLimit]);
 
   app.listen(config.port, config.hostName, () =>

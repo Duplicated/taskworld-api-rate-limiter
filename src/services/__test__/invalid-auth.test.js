@@ -1,5 +1,6 @@
 import httpMocks from "node-mocks-http";
 import { invalidAuth } from "../middleware";
+import redis from '../redis';
 
 const reqOptions = {
   method: "POST",
@@ -42,4 +43,9 @@ describe("Check if X-USER-ID header is included", () => {
       expect.objectContaining({ successful: false, message: "Missing user id" })
     );
   });
+});
+
+afterAll(async done => {
+  redis.disconnect();
+  done();
 });
