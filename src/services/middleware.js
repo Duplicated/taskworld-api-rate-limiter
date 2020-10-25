@@ -55,6 +55,7 @@ export const rateLimit = async (req, res, next) =>
           counter: 1,
         });
         redis.set(userId, JSON.stringify(newUserLogs));
+        redis.expireat(userId, now.clone().add(1, 'day').startOf('day').unix());
         // TODO: replace with proxy call
         return resolve(
           res.status(200).send({ successful: true, message: 'forwarding...' })
@@ -103,6 +104,7 @@ export const rateLimit = async (req, res, next) =>
         });
       }
       redis.set(userId, JSON.stringify(parsedRequestLogs));
+      redis.expireat(userId, now.clone().add(1, 'day').startOf('day').unix());
       // TODO: replace with proxy call
       return resolve(
         res.status(200).send({ successful: true, message: 'forwarding...' })
