@@ -29,9 +29,7 @@
  
 
 ### TODOs
-* Set up proxy for passing valid requests down to actual API servers. Use `express-http-proxy`.
-* Update test cases for rate limiter to actually talk to the proxy endpoint
-* Containerize this project
+* Build with Babel and containerize this project
 
 ### **Setup**
 
