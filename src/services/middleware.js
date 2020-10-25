@@ -80,7 +80,7 @@ export const rateLimit = async (req, res, next) =>
       );
 
       // limit exceeded
-      if (totalValidRequestsCount > config.requestLimit) {
+      if (totalValidRequestsCount >= config.requestLimit) {
         return resolve(
           res.status(429).send({
             successful: false,
