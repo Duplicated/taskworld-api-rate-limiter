@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import moment from 'moment';
 import config from '../config';
 import redis from './redis';
@@ -56,9 +57,10 @@ export const rateLimit = async (req, res, next) =>
         redis.set(userId, JSON.stringify(newUserLogs));
         redis.expireat(userId, now.clone().add(1, 'day').startOf('day').unix());
         // TODO: replace with proxy call
-        return resolve(
-          res.status(200).send({ successful: true, message: 'forwarding...' })
-        );
+        // return resolve(
+        //   res.status(200).send({ successful: true, message: 'forwarding...' })
+        // );
+        return resolve(next());
       }
       // otherwise, generate starting timestamp for the current time window
       // (from 60 seconds in the past up until now), then sum all counters
@@ -102,9 +104,10 @@ export const rateLimit = async (req, res, next) =>
       redis.set(userId, JSON.stringify(parsedRequestLogs));
       redis.expireat(userId, now.clone().add(1, 'day').startOf('day').unix());
       // TODO: replace with proxy call
-      return resolve(
-        res.status(200).send({ successful: true, message: 'forwarding...' })
-      );
+      // return resolve(
+      //   res.status(200).send({ successful: true, message: 'forwarding...' })
+      // );
+      return resolve(next());
     } catch (error) {
       console.log('error: ', error);
       return reject(
@@ -114,3 +117,8 @@ export const rateLimit = async (req, res, next) =>
       );
     }
   });
+
+export const generateProxyTarget = () =>
+  process.env.IS_PROD === 'true'
+    ? config.endpoint.production
+    : config.endpoint.mock;
