@@ -55,4 +55,5 @@ $ docker run --publish 6379:6379 --detach --name api-limiter-datastore redis:lat
 $ nvm use
 ```
 6. Create your own `.env` (you may use all `process.env.*` values in `src/config` for your guideline)
-6. `npm i` to install the project's dependent modules
+7. `npm i` to install the project's dependent modules
+8. `npm test` to run test cases
