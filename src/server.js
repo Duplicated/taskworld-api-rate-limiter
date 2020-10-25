@@ -22,14 +22,14 @@ const app = express();
   app.post('*', [
     invalidAuth,
     rateLimit,
-    proxy(generateProxyTarget, {
+    proxy(config.endpoint, {
       memoizeHost: false,
     }),
   ]);
 
   app.listen(config.port, config.hostName, () =>
     console.log(
-      `Rate limiter is now online at ${process.env.HOSTNAME} and is listening on port ${process.env.PORT}!`
+      `Rate limiter is now availabe at ${config.hostName} and is listening on port ${config.port}!`
     )
   );
 })();

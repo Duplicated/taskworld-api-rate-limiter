@@ -109,8 +109,3 @@ export const rateLimit = async (req, res, next) =>
       );
     }
   });
-
-export const generateProxyTarget = () =>
-  process.env.IS_PROD === 'true'
-    ? config.endpoint.production
-    : config.endpoint.mock;
