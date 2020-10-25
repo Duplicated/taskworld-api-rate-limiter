@@ -33,7 +33,7 @@
 * Update test cases for rate limiter to actually talk to the proxy endpoint
 * Containerize this project
 
-### Setup
+### **Setup**
 
 #### Dependencies
 * Docker runtime
@@ -56,5 +56,11 @@ $ nvm use
 $ docker image pull redis:latest
 $ docker run --publish 6379:6379 --detach --name api-limiter-datastore redis:latest --appendonly yes --requirepass "taskworld"
 ```
-5. `npm i` to install the project's dependent modules
-6. `npm test` to run test cases
+5. Run `npm i` to install the project's dependent modules
+6. Run `npm test` to run test cases
+
+#### **For manual E2E testing**
+
+1. Set your `MOCK_API_ENDPOINT` value in your `.env`. You may use the following endpoint for testing: https://express-mock-api-endpoint.herokuapp.com/
+2. Run `npm run start:dev` to start up the rate limiter service locally (make sure you have a Redis instance/container up and running)
+3. Use Postman to make any request to the local rate limiter service.
