@@ -40,20 +40,24 @@
 
 #### Instruction
 
-1. Set up Redis container and store its endpoint inside `.env`
+1. Clone this project
+2. Create `.nvmrc` with only the following line in it
+```sh
+12.18.3
+```
+3. Tell `nvm` to use this version of Node.js runtime
+```sh
+$ nvm use
+```
+4. Create your own `.env` (you may use all `process.env.*` values in `src/config` for your guideline)
+5. Set up Redis container and store its endpoint inside `.env`
+
+    * `REDIS_HOST` depends on how your docker's network bridge is configured
+    * `REDIS_PORT` is default port 6379
+    * `REDIS_PASS` is `taskworld`
 ```sh
 $ docker image pull redis:latest
 $ docker run --publish 6379:6379 --detach --name api-limiter-datastore redis:latest --appendonly yes --requirepass "taskworld"
 ```
-2. Clone this project
-3. Create `.nvmrc` with only the following line in it
-```sh
-12.18.3
-```
-4. Tell `nvm` to use this version of Node.js runtime
-```sh
-$ nvm use
-```
-6. Create your own `.env` (you may use all `process.env.*` values in `src/config` for your guideline)
-7. `npm i` to install the project's dependent modules
-8. `npm test` to run test cases
+6. `npm i` to install the project's dependent modules
+7. `npm test` to run test cases
