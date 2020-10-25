@@ -2,10 +2,12 @@ import config from './config';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
+import proxy from 'express-http-proxy';
 import {
   invalidAuth,
   rateLimit,
   notImplementedRoutes,
+  generateProxyTarget,
 } from './services/middleware';
 
 const app = express();
@@ -17,11 +19,17 @@ const app = express();
   app.use(bodyParser.json());
 
   app.use('*', notImplementedRoutes);
-  app.post('*', [invalidAuth, rateLimit]);
+  app.post('*', [
+    invalidAuth,
+    rateLimit,
+    proxy(generateProxyTarget, {
+      memoizeHost: false,
+    }),
+  ]);
 
   app.listen(config.port, config.hostName, () =>
     console.log(
-      `Example app available on ${process.env.HOSTNAME} listening on port ${process.env.PORT}!`
+      `Rate limiter is now online at ${process.env.HOSTNAME} and is listening on port ${process.env.PORT}!`
     )
   );
 })();

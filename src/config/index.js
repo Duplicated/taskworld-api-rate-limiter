@@ -9,4 +9,8 @@ export default {
     port: process.env.REDIS_PORT || '6379',
     password: process.env.REDIS_PASS,
   },
+  endpoint: {
+    production: process.env.API_ENDPOINT || 'www.google.com',
+    mock: process.env.MOCK_API_ENDPOINT || 'localhost',
+  }
 };
