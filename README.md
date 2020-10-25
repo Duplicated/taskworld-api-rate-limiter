@@ -30,27 +30,24 @@
 
 ### TODOs
 * Set up proxy for passing valid requests down to actual API servers. Use `express-http-proxy`.
-* Create test cases for actual rate limiter (a mock Express app to simulate a reverse proxy/load balancer endpoint for API servers)
+* Update test cases for rate limiter to actually talk to the proxy endpoint
+* Containerize this project
 
 ### Setup
 
 #### Dependencies
 * Docker runtime
-* Node.js (this project uses `nvm` to set the environment to be 12.18.3)
+* Node.js (this project uses `nvm` to set the environment to be 12.18.3. You can download the script from [here](https://github.com/nvm-sh/nvm))
 
 #### Instruction
 
 1. Clone this project
-2. Create `.nvmrc` with only the following line in it
-```sh
-12.18.3
-```
-3. Tell `nvm` to use this version of Node.js runtime
+2. Tell `nvm` to use this version of Node.js runtime (in case you have some other version of Node.js installed globally on your machine)
 ```sh
 $ nvm use
 ```
-4. Create your own `.env` (you may use all `process.env.*` values in `src/config` for your guideline)
-5. Set up Redis container and store its endpoint inside `.env`
+3. Create your own `.env` (you may use all `process.env.*` values in `src/config` for your guideline)
+4. Set up Redis container and store its endpoint inside `.env`
 
     * `REDIS_HOST` depends on how your docker's network bridge is configured
     * `REDIS_PORT` is default port 6379
@@ -59,5 +56,5 @@ $ nvm use
 $ docker image pull redis:latest
 $ docker run --publish 6379:6379 --detach --name api-limiter-datastore redis:latest --appendonly yes --requirepass "taskworld"
 ```
-6. `npm i` to install the project's dependent modules
-7. `npm test` to run test cases
+5. `npm i` to install the project's dependent modules
+6. `npm test` to run test cases
