@@ -26,6 +26,19 @@ export const invalidAuth = async (req, res, next) =>
     }
   });
 
+export const notImplementedRoutes = async (req, res, next) =>
+  new Promise((resolve) => {
+    if (req.method !== 'POST') {
+      return resolve(
+        res
+          .status(501)
+          .send({ successful: false, message: 'Not implemented yet' })
+      );
+    } else {
+      resolve(next());
+    }
+  });
+
 export const rateLimit = async (req, res, next) =>
   new Promise(async (resolve, reject) => {
     try {
