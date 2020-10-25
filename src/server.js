@@ -12,6 +12,26 @@ const app = express();
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
 
+  app.use(
+    '*',
+    async (req, res, next) =>
+      new Promise((resolve) => {
+        if (
+          req.method === 'GET' ||
+          req.method === 'PUT' ||
+          req.method === 'PATCH' ||
+          req.method === 'DELETE'
+        ) {
+          return resolve(
+            res
+              .status(501)
+              .send({ successful: false, message: 'Not implemented yet' })
+          );
+        } else {
+          resolve(next());
+        }
+      })
+  );
   app.post('*', [invalidAuth, rateLimit]);
 
   app.listen(config.port, config.hostName, () =>

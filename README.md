@@ -50,5 +50,9 @@ $ docker run --publish 6379:6379 --detach --name api-limiter-datastore redis:lat
 ```sh
 12.18.3
 ```
-4. Create your own `.env` (you may use all `process.env.*` values in `src/config` for your guideline)
-5. `npm i` to install the project's dependent modules
+4. Tell `nvm` to use this version of Node.js runtime
+```sh
+$ nvm use
+```
+6. Create your own `.env` (you may use all `process.env.*` values in `src/config` for your guideline)
+6. `npm i` to install the project's dependent modules
